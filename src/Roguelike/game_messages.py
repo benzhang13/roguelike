@@ -20,7 +20,7 @@ class MessageLog:
 
         for line in new_msg_line:
             # Deletes top message if message log is full
-            if len(self.messages) == self.height:
+            if len(self.messages) + 1 == self.height:
                 del self.messages[0]
 
             # Adds new line as a message object
