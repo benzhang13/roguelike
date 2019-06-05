@@ -6,3 +6,4 @@ class GameStates(Enum):
     PLAYER_DEAD = 3
     SHOWING_INVENTORY = 4
     DROPPING_INVENTORY = 5
+    TARGETING = 6
