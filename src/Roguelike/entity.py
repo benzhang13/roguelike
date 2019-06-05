@@ -93,6 +93,18 @@ class Entity:
             # Delete the path to free memory
         libtcod.path_delete(my_path)
 
+    def move_away_from(self, other, game_map, entities):
+        dx = other.x - self.x
+        dy = other.y - self.y
+
+        distance = math.sqrt(dx ** 2 + dy ** 2)
+
+        dx = int(round(dx / distance)) * -1
+        dy = int(round(dy / distance)) * -1
+
+        if not game_map.is_blocked(self.x + dx, self.y + dy) and not get_blocking_entities_at_location(entities, self.x + dx, self.y + dy):
+            self.move(dx, dy)
+
     def distance(self, x, y):
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
