@@ -118,7 +118,7 @@ def cast_betrayal(*args, **kwargs):
             entity.ai = betraying_ai
 
             results.append({"consumed": True,
-                            "message": Message("The {0} is betraying its brethren!".format(entity.name), libtcod.red)})
+                            "message": Message("The {0} is betraying its brethren!".format(entity.name), libtcod.light_blue)})
 
             break
     else:
