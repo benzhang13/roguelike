@@ -10,12 +10,14 @@ from render_functions import RenderOrder
 from components.item import Item
 from item_functions import *
 from game_messages import Message
+from components.stairs import Stairs
 
 class GameMap:
-    def __init__(self, width, height):
+    def __init__(self, width, height, dungeon_level=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+        self.dungeon_level = dungeon_level
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -26,6 +28,9 @@ class GameMap:
 
         rooms = []
         num_rooms = 0
+
+        center_of_last_room_x = 0
+        center_of_last_room_y = 0
 
         for r in range(max_rooms):
             # generates random room size
@@ -55,6 +60,9 @@ class GameMap:
                     # finds center of previous room
                     (prev_x, prev_y) = rooms[num_rooms - 1].center()
 
+                    center_of_last_room_x = new_x
+                    center_of_last_room_y = new_y
+
                     # flips a coin to find order of tunnel generation
                     if randint(0, 1) == 0:
                         # moves horizontally then vertically
@@ -68,6 +76,11 @@ class GameMap:
                 self.place_entities(new_room, entities, max_monsters_per_room, max_items_per_room)
                 rooms.append(new_room)
                 num_rooms += 1
+
+        stairs_component = Stairs(self.dungeon_level + 1)
+        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, ">", libtcod.white, "Stairs", False,
+                             render_order=RenderOrder.STAIRS, stairs=stairs_component)
+        entities.append(down_stairs)
 
     def create_room(self, room):
         for x in range(room.x1 + 1, room.x2):
@@ -135,3 +148,18 @@ class GameMap:
             return True
         else:
             return False
+
+    def next_floor(self, player, message_log, constants):
+        self.dungeon_level += 1
+        entities = [player]
+
+        self.tiles = self.initialize_tiles()
+        self.make_map(constants["max_rooms"], constants["room_max_size"], constants["room_min_size"],
+                      constants["map_width"], constants["map_height"], player, entities,
+                      constants["max_monsters_per_room"], constants["max_items_per_room"])
+        player.fighter.heal(player.fighter.max_hp // 2)
+
+        message_log.add_message(Message("You take a moment to rest, and recover your strength.", libtcod.light_violet))
+
+        return entities
+
