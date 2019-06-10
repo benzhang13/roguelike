@@ -12,6 +12,8 @@ from item_functions import *
 from game_messages import Message
 from components.stairs import Stairs
 from random_utils import random_choice_from_dict, from_dungeon_level
+from components.equipment import Equipment, EquipmentSlots
+from components.equippable import Equippable
 
 class GameMap:
     def __init__(self, width, height, dungeon_level=1):
@@ -109,12 +111,15 @@ class GameMap:
         number_of_items = randint(0, max_items_per_room)
 
         monster_chances = {"orc": 80,
-                           "troll": from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)}
+                           "troll": from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level),
+                           "dragon": from_dungeon_level([[10, 7], [20, 10], [30, 14]], self.dungeon_level)}
         item_chances = {"health_potion": 35,
                         "lightning_scroll": from_dungeon_level([[25, 4]], self.dungeon_level),
                         "fireball_scroll": from_dungeon_level([[25, 6]], self.dungeon_level),
                         "confusion_scroll": from_dungeon_level([[10, 2]], self.dungeon_level),
-                        "betrayal_scroll": from_dungeon_level([[10, 5]], self.dungeon_level)}
+                        "betrayal_scroll": from_dungeon_level([[10, 5]], self.dungeon_level),
+                        "iron_sword": from_dungeon_level([[5, 4]], self.dungeon_level),
+                        "wooden_shield": from_dungeon_level([[15, 8]], self.dungeon_level)}
 
         for i in range(number_of_monsters):
             x = randint(room.x1 + 1, room.x2 - 1)
@@ -132,6 +137,11 @@ class GameMap:
                     fighter_component = Fighter(hp=30, defense=2, power=8, xp=100)
                     ai_component = BasicMonster()
                     monster = Entity(x, y, "T", libtcod.darker_green, "Troll", blocks=True,
+                                     render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
+                elif monster_choice == "dragon":
+                    fighter_component = Fighter(hp=40, defense=2, power=12, xp=500)
+                    ai_component = BasicMonster()
+                    monster = Entity(x, y, "D", libtcod.dark_red, "Dragon", blocks=True,
                                      render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
                 entities.append(monster)
@@ -175,6 +185,14 @@ class GameMap:
                     item_component = Item(use_function=cast_lightning, damage=40, maximum_range=5)
                     item = Entity(x, y, "#", libtcod.yellow, "Lightning Scroll", False, render_order=RenderOrder.ITEM,
                                   item=item_component)
+                elif item_choice == "iron_sword":
+                    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
+                    item = Entity(x, y, "/", libtcod.silver, "Iron Sword", False, render_order=RenderOrder.ITEM,
+                                  equippable=equippable_component)
+                elif item_choice == "wooden_shield":
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
+                    item = Entity(x, y, "[", libtcod.darker_orange, "Wooden Shield", False, render_order=RenderOrder.ITEM,
+                                  equippable=equippable_component)
                 entities.append(item)
 
     def is_blocked(self, x, y):
