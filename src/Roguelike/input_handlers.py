@@ -11,6 +11,10 @@ def handle_keys(key, game_state):
         return handle_player_inventory_keys(key)
     elif game_state == GameStates.TARGETING:
         return handle_player_targeting_keys(key)
+    elif game_state == GameStates.LEVELED_UP:
+        return handle_player_level_up_keys(key)
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        return handle_player_character_screen_keys(key)
 
     return {}
 
@@ -40,6 +44,10 @@ def handle_player_turn_keys(key):
         return {"show_inventory": True}
     elif key_char == 'd':
         return {"drop_inventory": True}
+    elif key_char == 'c':
+        return {"show_character_screen": True}
+    elif key_char == 'z':
+        return {"wait": True}
     elif key.vk == libtcod.KEY_ENTER:
         return {"take_stairs": True}
 
@@ -97,6 +105,24 @@ def handle_main_menu(key):
     elif key_char == "b":
         return {"load_game": True}
     elif key_char == "c" or key.vk == libtcod.KEY_ESCAPE:
+        return {"exit": True}
+
+    return {}
+
+def handle_player_level_up_keys(key):
+    key_char = chr(key.c)
+
+    if key_char == "a":
+        return {"level_up": "hp"}
+    elif key_char == "b":
+        return {"level_up": "str"}
+    elif key_char == "c":
+        return {"level_up": "def"}
+
+    return {}
+
+def handle_player_character_screen_keys(key):
+    if key.vk == libtcod.KEY_ESCAPE:
         return {"exit": True}
 
     return {}

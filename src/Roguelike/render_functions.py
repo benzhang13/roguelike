@@ -1,7 +1,7 @@
 import tcod as libtcod
 from enum import Enum
 from game_states import GameStates
-from menus import inventory_menu
+from menus import inventory_menu, level_up_menu, character_screen
 
 
 class RenderOrder(Enum):
@@ -29,10 +29,12 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_colour, back_
         libtcod.console_rect(panel, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
     libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE, libtcod.CENTER, "{0}: {1}/{2}".format(name, value, maximum))
+    libtcod.console_print_ex(panel, int(x + total_width / 2 + 2), y, libtcod.BKGND_NONE,
+                             libtcod.CENTER, "{0}: {1}/{2}".format(name, value, maximum))
 
 
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colours, game_state):
+def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height,
+               bar_width, panel_height, panel_y, mouse, colours, game_state):
 
     # draws tiles onto the game map
     if fov_recompute:
@@ -86,6 +88,10 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
             inventory_title = "Press the key next to an item to drop it, or Esc to cancel\n"
 
         inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+    elif game_state == GameStates.LEVELED_UP:
+        level_up_menu(con, "Level up! Choose a stat to raise:", player, 40, screen_width, screen_height)
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        character_screen(player, 30, 10, screen_width, screen_height)
 
 
 def clear_all(con, entities):
