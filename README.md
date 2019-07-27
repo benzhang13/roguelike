@@ -1,3 +1,2 @@
 # roguelike
-Roguelike game lol
-To run, download the zip, unpack it, and run src/Roguelike/engine.py
+To run, download the zip or pull repo, unpack it, and run src/Roguelike/engine.py
